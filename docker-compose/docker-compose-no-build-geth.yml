@@ -5,6 +5,8 @@ services:
     image: postgres:14
     restart: always
     container_name: 'postgres'
+    env_file:
+      -  ./envs/common-blockscout.env
     environment:
         POSTGRES_PASSWORD: ''
         POSTGRES_USER: 'postgres'
@@ -12,7 +14,7 @@ services:
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
     ports:
-      - 7432:5432
+      - ${BIND_INTERNAL_IP}:7432:5432
 
   blockscout:
     depends_on:
@@ -30,10 +32,10 @@ services:
     environment:
         ETHEREUM_JSONRPC_VARIANT: 'geth'
         BLOCK_TRANSFORMER: 'clique'
-        ETHEREUM_JSONRPC_HTTP_URL: http://host.docker.internal:8545/
-        DATABASE_URL: postgresql://postgres:@host.docker.internal:7432/blockscout?ssl=false
+#        ETHEREUM_JSONRPC_HTTP_URL: https://rpc.cavies.xyz
+        DATABASE_URL: "postgresql://postgres:@${BIND_INTERNAL_IP}:7432/blockscout?ssl=false"
         ECTO_USE_SSL: 'false'
-        SECRET_KEY_BASE: '56NtB48ear7+wMSf0IQuWDAAazhpb31qyc7GiyspBP2vh7t5zlCsF5QDv76chXeN'
+        SECRET_KEY_BASE: '56NtB48ear7+wMSf0IQuWDAAazhpb31qyc7GiCAVIESCHAINyspBP2vh7t5zlCsF5QDv76chXeN'
     ports:
-      - 4000:4000
+      - 127.0.0.1:4000:4000
 
